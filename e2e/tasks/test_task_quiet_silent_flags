@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+# Test that --quiet and --silent global flags work correctly for task output
+
+cat <<EOF >mise.toml
+[tasks.hello]
+run = 'echo "task output"'
+EOF
+
+# --quiet: should show task stdout, suppress mise info messages
+output="$(mise --quiet run hello 2>&1)"
+assert_contains "echo '$output'" "task output"
+
+# --silent: should suppress both task stdout AND mise info messages
+output="$(mise --silent run hello 2>&1)"
+assert_not_contains "echo '$output'" "task output"
+
+# -q (short for --quiet): same as --quiet
+output="$(mise -q run hello 2>&1)"
+assert_contains "echo '$output'" "task output"
+
+# mise run -S (short for --silent on run subcommand): should suppress task output
+output="$(mise run -S hello 2>&1)"
+assert_not_contains "echo '$output'" "task output"
